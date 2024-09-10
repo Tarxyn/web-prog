@@ -1,0 +1,8 @@
+.element {
+    opacity: 0; /* Скрываем элемент */
+    transition: opacity 1s ease; /* Анимация появления */
+}
+
+.element.visible {
+    opacity: 1; /* Показываем элемент */
+}
