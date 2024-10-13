@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Светофор Vue.js</title>
+    <style>
+        .traffic-light {
+            width: 100px;
+            height: 300px;
+            margin: 50px auto;
+            background-color: #333;
+            border-radius: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .light {
+            width: 80px;
+            height: 80px;
+            margin: 10px auto;
+            border-radius: 50%;
+            background-color: #555;
+        }
+        .light.green {
+            background-color: green;
+        }
+        .light.yellow {
+            background-color: yellow;
+        }
+        .light.red {
+            background-color: red;
+        }
+        .controls {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .settings {
+            display: none;
+            margin-top: 20px;
+        }
+        .settings.active {
+            display: block;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="/" id="project1">Оглавление</a>
+        <a href="/task1" id="project1">Задание 1</a>
+        <a href="/task2" id="project2">Задание 2</a>
+        <a href="/task3" id="project3">Задание 3</a>
+        <a href="/task4" id="project4">Задание 4</a>
+    </div>
+
+    <div class="content">
+
+    <div id="app">
+        <div class="traffic-light">
+            <div :class="['light', currentLight === 'red' ? 'red' : '']"></div>
+            <div :class="['light', currentLight === 'yellow' ? 'yellow' : '']"></div>
+            <div :class="['light', currentLight === 'green' ? 'green' : '']"></div>
+        </div>
+        <div class="controls">
+            <label><input type="radio" value="on" v-model="power" @change="togglePower"> Включен</label>
+            <label><input type="radio" value="off" v-model="power" @change="togglePower"> Выключен</label>
+            <br>
+            <button @click="toggleSettings">Настройки</button>
+        </div>
+        <div class="settings" :class="{active: showSettings}">
+            <h3>Настройки времени</h3>
+            <label>Время зеленого (сек): <input type="number" v-model.number="greenTime" min="1"></label><br>
+            <label>Время красного (сек): <input type="number" v-model.number="redTime" min="1"></label>
+        </div>
+    </div>
+    </div>
+
+    <script src="vue.min.js"></script>
+    <script>
+        new Vue({
+        el: '#app',
+        data: {
+            currentLight: '',
+            greenTime: 5,
+            yellowTime: 5,
+            redTime: 5,
+            power: 'off',
+            intervalId: null,
+            showSettings: false,
+            lightSequence: ['green', 'yellow', 'red', 'yellow'],
+            sequenceIndex: 0
+        },
+        methods: {
+            togglePower() {
+            if (this.power === 'on') {
+                this.startTrafficLight();
+            } else {
+                this.stopTrafficLight();
+            }
+            },
+            startTrafficLight() {
+            // Всегда начинаем с зеленого при включении
+            this.sequenceIndex = 0;
+            this.currentLight = this.lightSequence[this.sequenceIndex];
+            this.changeLight();
+            },
+            stopTrafficLight() {
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+            this.currentLight = '';
+            },
+            changeLight() {
+            let time;
+            switch(this.currentLight) {
+                case 'green':
+                time = this.greenTime;
+                break;
+                case 'yellow':
+                time = this.yellowTime;
+                break;
+                case 'red':
+                time = this.redTime;
+                break;
+            }
+
+            if (this.intervalId) {
+                clearInterval(this.intervalId);
+            }
+
+            this.intervalId = setInterval(() => {
+                // Переход к следующему цвету в последовательности
+                this.sequenceIndex = (this.sequenceIndex + 1) % this.lightSequence.length;
+                this.currentLight = this.lightSequence[this.sequenceIndex];
+                this.changeLight();
+            }, time * 1000);
+            },
+            toggleSettings() {
+            this.showSettings = !this.showSettings;
+            }
+        }
+        });
+    </script>
+</body>
+</html>

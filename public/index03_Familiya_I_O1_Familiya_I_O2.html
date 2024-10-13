@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Перемещение квадрата в SVG</title>
+    <script src="vue.global.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #333;
+            overflow: hidden;
+        }
+        .navbar a {
+            float: left;
+            display: block;
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+        }
+        .navbar a:hover {
+            background-color: #ddd;
+            color: black;
+        }
+        .content {
+            padding: 20px;
+        }
+    </style>
+
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="/" id="project1">Оглавление</a>
+        <a href="/task1" id="project1">Задание 1</a>
+        <a href="/task2" id="project2">Задание 2</a>
+        <a href="/task3" id="project3">Задание 3</a>
+        <a href="/task4" id="project4">Задание 4</a>
+    </div>
+
+    <div class="content">
+
+    <div id="app">
+        <svg width="640" height="480" style="border: 1px dotted;">
+            <rect :x="x" :y="y" width="5" height="5" fill="blue"></rect>
+        </svg>
+    </div>
+    </div>
+
+    <script>
+    const { createApp, ref, onMounted } = Vue;
+
+    createApp({
+        setup() {
+            const x = ref(Math.floor(Math.random() * (640 - 7)) + 2);
+            const y = ref(Math.floor(Math.random() * (480 - 7)) + 2);
+            const step = 5;
+            
+            const moveSquare = (event) => {
+                if (event.key === "ArrowLeft" && x.value > 2) {
+                    x.value -= step;
+                }
+                if (event.key === "ArrowRight" && x.value < 640 - 7) {
+                    x.value += step;
+                }
+                if (event.key === "ArrowUp" && y.value > 2) {
+                    y.value -= step;
+                }
+                if (event.key === "ArrowDown" && y.value < 480 - 7) {
+                    y.value += step;
+                }
+            };
+
+            onMounted(() => {
+                window.addEventListener('keydown', moveSquare);
+            });
+
+            return {
+                x,
+                y
+            };
+        }
+    }).mount('#app');
+    </script>
+</body>
+</html>
