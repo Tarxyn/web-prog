@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>index-hooks_Familiya_I_O</title>
+    <script src="vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        #appVue {
+            margin: 20px;
+        }
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="appVue">
+        <h1>Витки жизненного цикла</h1>
+        <p v-for="(m, index) in messages" :key="index">{{ m }}</p>
+        <button @click="toUpdate">Обновить</button>
+        <button @click="toDestroy">Уничтожить</button>
+    </div>
+
+    <script>
+        const { createApp, ref, onBeforeMount, onMounted, onBeforeUpdate, onUpdated, onBeforeUnmount, onUnmounted } = Vue;
+
+        const App = {
+            setup() {
+                const messages = ref([]);
+                const flgUpdated = ref(false);
+                const flgBefore = ref(false);
+
+                const toUpdate = () => {
+                    flgUpdated.value = false;
+                    flgBefore.value = false;
+                    messages.value.push("Нажата кнопка 'Обновить'");
+                };
+
+                const toDestroy = () => {
+                    appInstance.unmount();
+                };
+
+                onBeforeMount(() => {
+                    const now = new Date();
+                    messages.value.push("Перед монтажом объекта: " + now + " мс: " + now.getMilliseconds());
+                });
+
+                onMounted(() => {
+                    const now = new Date();
+                    messages.value.push("Объект смонтирован: " + now + " мс: " + now.getMilliseconds());
+                });
+
+                onBeforeUpdate(() => {
+                    if (!flgBefore.value) {
+                        const now = new Date();
+                        messages.value.push("Перед обновлением объекта: " + now + " мс: " + now.getMilliseconds());
+                        flgBefore.value = true;
+                    }
+                });
+
+                onUpdated(() => {
+                    if (!flgUpdated.value) {
+                        const now = new Date();
+                        messages.value.push("Объект обновлён: " + now + " мс: " + now.getMilliseconds());
+                        flgUpdated.value = true;
+                    }
+                });
+
+                onBeforeUnmount(() => {
+                    const now = new Date();
+                    console.log("Перед уничтожением объекта: " + now + " мс: " + now.getMilliseconds());
+                    messages.value.push("Перед уничтожением объекта: " + now + " мс: " + now.getMilliseconds());
+                });
+
+                onUnmounted(() => {
+                    const now = new Date();
+                    console.log("Объект уничтожен: " + now + " мс: " + now.getMilliseconds());
+                });
+
+                return {
+                    messages,
+                    toUpdate,
+                    toDestroy
+                };
+            }
+        };
+
+        const appInstance = createApp(App);
+        appInstance.mount('#appVue');
+    </script>
+</body>
+</html>
