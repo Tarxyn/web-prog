@@ -3,51 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Параметрическая вставка</title>
+    <title>index01_Familiya_I_O1_Familiya_I_O2</title>
     <script src="vue.global.js"></script>
-
     <style>
         body {
             font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
+            background-color: #f9f9f9;
         }
-        .navbar {
-            background-color: #333;
-            overflow: hidden;
+        table {
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .navbar a {
-            float: left;
-            display: block;
+        td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100px;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
             color: white;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
         }
-        .navbar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
-
-        .content {
-            padding: 20px;
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
-
 </head>
 <body>
-    <div class="navbar">
-        <a href="/" id="project1">Оглавление</a>
-        <a href="/task1" id="project1">Задание 1</a>
-        <a href="/task2" id="project2">Задание 2</a>
-        <a href="/task3" id="project3">Задание 3</a>
-        <a href="/task4" id="project4">Задание 4</a>
-    </div>
 
-    
-    <div class="content">
     <div id="app">
-        <table :style="tableStyle" border="1">
+        <table :style="tableStyle">
             <tr>
                 <td>Ширина: {{ width }}px</td>
                 <td>Высота: {{ height }}px</td>
@@ -57,11 +58,26 @@
                 <td>Внутр. отступ: {{ cellpadding }}px</td>
             </tr>
         </table>
+
+        <div>
+            <label for="widthInput">Ширина:</label>
+            <input id="widthInput" type="number" v-model="width" @input="updateTableStyle" />
+
+            <label for="heightInput">Высота:</label>
+            <input id="heightInput" type="number" v-model="height" @input="updateTableStyle" />
+
+            <label for="cellspacingInput">Внеш. отступ:</label>
+            <input id="cellspacingInput" type="number" v-model="cellspacing" @input="updateTableStyle" />
+
+            <label for="cellpaddingInput">Внутр. отступ:</label>
+            <input id="cellpaddingInput" type="number" v-model="cellpadding" @input="updateTableStyle" />
+
+            <button @click="resetValues">Сбросить значения</button>
+        </div>
     </div>
-</div>
 
     <script>
-    const { createApp, ref } = Vue;
+    const { createApp, ref, watch } = Vue;
 
     createApp({
         setup() {
@@ -72,13 +88,27 @@
 
             const tableStyle = ref(`width: ${width.value}px; height: ${height.value}px; border-spacing: ${cellspacing.value}px; padding: ${cellpadding.value}px;`);
 
+            const updateTableStyle = () => {
+                tableStyle.value = `width: ${width.value}px; height: ${height.value}px; border-spacing: ${cellspacing.value}px; padding: ${cellpadding.value}px;`;
+            };
+
+            const resetValues = () => {
+                width.value = 200;
+                height.value = 100;
+                cellspacing.value = 20;
+                cellpadding.value = 20;
+                updateTableStyle();
+            };
+
             return {
                 width,
                 height,
                 cellspacing,
                 cellpadding,
-                tableStyle
-            }
+                tableStyle,
+                updateTableStyle,
+                resetValues
+            };
         }
     }).mount('#app');
     </script>

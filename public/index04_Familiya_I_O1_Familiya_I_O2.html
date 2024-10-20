@@ -3,23 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Светофор Vue.js</title>
+    <title>index04_Familiya_I_O1_Familiya_I_O2</title>
+    <script src="vue.global.js"></script>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
         .traffic-light {
             width: 100px;
             height: 300px;
-            margin: 50px auto;
             background-color: #333;
             border-radius: 10px;
             padding: 10px;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-around;
         }
         .light {
             width: 80px;
             height: 80px;
-            margin: 10px auto;
             border-radius: 50%;
             background-color: #555;
+            transition: background-color 0.5s;
         }
         .light.green {
             background-color: green;
@@ -41,44 +55,26 @@
         .settings.active {
             display: block;
         }
-
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            background-color: #333;
-            overflow: hidden;
-        }
-        .navbar a {
-            float: left;
-            display: block;
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
             color: white;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
         }
-        .navbar a:hover {
-            background-color: #ddd;
-            color: black;
+        button:hover {
+            background-color: #0056b3;
         }
-        .content {
-            padding: 20px;
+        label {
+            display: block;
+            margin: 10px 0;
         }
     </style>
 </head>
 <body>
-
-    <div class="navbar">
-        <a href="/" id="project1">Оглавление</a>
-        <a href="/task1" id="project1">Задание 1</a>
-        <a href="/task2" id="project2">Задание 2</a>
-        <a href="/task3" id="project3">Задание 3</a>
-        <a href="/task4" id="project4">Задание 4</a>
-    </div>
-
-    <div class="content">
 
     <div id="app">
         <div class="traffic-light">
@@ -87,83 +83,107 @@
             <div :class="['light', currentLight === 'green' ? 'green' : '']"></div>
         </div>
         <div class="controls">
-            <label><input type="radio" value="on" v-model="power" @change="togglePower"> Включен</label>
-            <label><input type="radio" value="off" v-model="power" @change="togglePower"> Выключен</label>
-            <br>
+            <label>
+                <input type="radio" value="on" v-model="power" @change="togglePower"> Включен
+            </label>
+            <label>
+                <input type="radio" value="off" v-model="power" @change="togglePower"> Выключен
+            </label>
             <button @click="toggleSettings">Настройки</button>
         </div>
         <div class="settings" :class="{active: showSettings}">
             <h3>Настройки времени</h3>
-            <label>Время зеленого (сек): <input type="number" v-model.number="greenTime" min="1"></label><br>
+            <label>Время зеленого (сек): <input type="number" v-model.number="greenTime" min="1"></label>
             <label>Время красного (сек): <input type="number" v-model.number="redTime" min="1"></label>
         </div>
     </div>
-    </div>
 
-    <script src="vue.min.js"></script>
     <script>
-        new Vue({
-        el: '#app',
-        data: {
-            currentLight: '',
-            greenTime: 5,
-            yellowTime: 5,
-            redTime: 5,
-            power: 'off',
-            intervalId: null,
-            showSettings: false,
-            lightSequence: ['green', 'yellow', 'red', 'yellow'],
-            sequenceIndex: 0
-        },
-        methods: {
-            togglePower() {
-            if (this.power === 'on') {
-                this.startTrafficLight();
-            } else {
-                this.stopTrafficLight();
+        const { createApp, ref, onMounted } = Vue;
+    
+        createApp({
+            setup() {
+                const currentLight = ref('');  // Текущий цвет светофора
+                const greenTime = ref(5);      // Время горения зеленого света
+                const yellowTime = ref(2);     // Время горения желтого света
+                const redTime = ref(5);        // Время горения красного света
+                const power = ref('off');      // Состояние питания (включен/выключен)
+                const intervalId = ref(null);   // Идентификатор интервала для смены света
+                const showSettings = ref(false); // Показать/скрыть настройки
+                const lightSequence = ref(['green', 'yellow', 'red', 'yellow']); // Последовательность цветов
+                const sequenceIndex = ref(0);   // Индекс текущего цвета в последовательности
+    
+                // Функция для переключения питания светофора
+                const togglePower = () => {
+                    if (power.value === 'on') {
+                        startTrafficLight();
+                    } else {
+                        stopTrafficLight();
+                    }
+                };
+    
+                // Функция для запуска светофора
+                const startTrafficLight = () => {
+                    sequenceIndex.value = 0;
+                    currentLight.value = lightSequence.value[sequenceIndex.value];
+                    changeLight();
+                };
+    
+                // Функция для остановки светофора
+                const stopTrafficLight = () => {
+                    clearInterval(intervalId.value);
+                    intervalId.value = null;
+                    currentLight.value = ''; // Отключить все огни
+                };
+    
+                // Функция для смены цвета светофора
+                const changeLight = () => {
+                    let time;
+                    switch (currentLight.value) {
+                        case 'green':
+                            time = greenTime.value;
+                            break;
+                        case 'yellow':
+                            time = yellowTime.value;
+                            break;
+                        case 'red':
+                            time = redTime.value;
+                            break;
+                    }
+    
+                    // Удаляем предыдущий интервал, если он существует
+                    if (intervalId.value) {
+                        clearInterval(intervalId.value);
+                    }
+    
+                    // Устанавливаем новый интервал для смены цвета
+                    intervalId.value = setInterval(() => {
+                        // Переход к следующему цвету в последовательности
+                        sequenceIndex.value = (sequenceIndex.value + 1) % lightSequence.value.length;
+                        currentLight.value = lightSequence.value[sequenceIndex.value];
+                        changeLight(); // Обновляем цвет
+                    }, time * 1000);
+                };
+    
+                // Функция для переключения видимости настроек
+                const toggleSettings = () => {
+                    showSettings.value = !showSettings.value;
+                };
+    
+                // Возвращаем все переменные и функции, чтобы они были доступны в шаблоне
+                return {
+                    currentLight,
+                    greenTime,
+                    yellowTime,
+                    redTime,
+                    power,
+                    intervalId,
+                    showSettings,
+                    togglePower,
+                    toggleSettings
+                };
             }
-            },
-            startTrafficLight() {
-            // Всегда начинаем с зеленого при включении
-            this.sequenceIndex = 0;
-            this.currentLight = this.lightSequence[this.sequenceIndex];
-            this.changeLight();
-            },
-            stopTrafficLight() {
-            clearInterval(this.intervalId);
-            this.intervalId = null;
-            this.currentLight = '';
-            },
-            changeLight() {
-            let time;
-            switch(this.currentLight) {
-                case 'green':
-                time = this.greenTime;
-                break;
-                case 'yellow':
-                time = this.yellowTime;
-                break;
-                case 'red':
-                time = this.redTime;
-                break;
-            }
-
-            if (this.intervalId) {
-                clearInterval(this.intervalId);
-            }
-
-            this.intervalId = setInterval(() => {
-                // Переход к следующему цвету в последовательности
-                this.sequenceIndex = (this.sequenceIndex + 1) % this.lightSequence.length;
-                this.currentLight = this.lightSequence[this.sequenceIndex];
-                this.changeLight();
-            }, time * 1000);
-            },
-            toggleSettings() {
-            this.showSettings = !this.showSettings;
-            }
-        }
-        });
+        }).mount('#app');
     </script>
 </body>
 </html>
