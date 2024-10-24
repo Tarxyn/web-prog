@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index-v-for_Familiya_I_O</title>
+    <script src="vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        ol {
+            margin-top: 20px;
+            padding: 0;
+            list-style-type: none;
+        }
+        li {
+            padding: 5px;
+            background: #e7e7e7;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        input {
+            padding: 10px;
+            margin: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <h1>Список автомобилей</h1>
+        <input v-model="newCar" placeholder="Введите название автомобиля" />
+        <div>
+            <button @click="addCar">Добавить автомобиль</button>
+            <button @click="removeCar">Удалить автомобиль</button>
+        </div>
+        <ol>
+            <li v-for="(car, index) in cars" :key="index">{{ car }}</li>
+        </ol>
+        <div v-if="message" style="color: red;">{{ message }}</div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+
+        createApp({
+            setup() {
+                const cars = ref([]); // Массив для хранения автомобилей
+                const newCar = ref(''); // Переменная для нового автомобиля
+                const message = ref(''); // Переменная для сообщений
+
+                // Функция для добавления автомобиля
+                const addCar = () => {
+                    if (newCar.value.trim()) {
+                        cars.value.push(newCar.value.trim()); // Добавляем автомобиль в массив
+                        newCar.value = ''; // Очищаем поле ввода
+                        message.value = ''; // Убираем сообщение
+                    } else {
+                        message.value = 'Введите название автомобиля!';
+                    }
+                };
+
+                // Функция для удаления автомобиля
+                const removeCar = () => {
+                    if (cars.value.length > 1) {
+                        const carToRemove = prompt('Введите название автомобиля для удаления:');
+                        if (carToRemove) {
+                            const index = cars.value.indexOf(carToRemove.trim());
+                            if (index >= 0) {
+                                cars.value.splice(index, 1); // Удаляем автомобиль из массива
+                                message.value = ''; // Убираем сообщение
+                            } else {
+                                message.value = 'Автомобиль не найден!';
+                            }
+                        }
+                    } 
+                    
+                    else {
+                        message.value = 'Запрещено удалять последний элемент!'; // Предупреждение при попытке удалить последний элемент
+                    }
+                };
+
+                return {
+                    cars,
+                    newCar,
+                    message,
+                    addCar,
+                    removeCar
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

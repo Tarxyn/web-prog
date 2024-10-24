@@ -1,0 +1,18 @@
+как создать такое
+
+Создайте новую директорию для вашего проекта и откройте терминал в этой директории.
+mkdir my-node-website
+cd my-node-website
+
+Выполните команду для инициализации нового проекта Node.js. Это создаст файл package.json.
+npm init -y
+
+Установите express для создания сервера.
+npm install express
+
+touch server.js // пример есть в моеё коде
+mkdir public // в неё складываем все HTML коды
+
+
+cd my-node-website
+node server.js
