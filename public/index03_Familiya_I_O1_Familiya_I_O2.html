@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index03_Familiya_I_O1_Familiya_I_O2</title>
+    <script src="vue.global.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f9f9f9;
+        }
+        svg {
+            border: 1px dotted #ccc;
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app" tabindex="0"> <!-- Add tabindex to make the div focusable -->
+        <svg width="640" height="480">
+            <rect :x="x" :y="y" width="5" height="5" fill="blue"></rect>
+        </svg>
+        <div class="controls">
+            <p>Используйте стрелки на клавиатуре для перемещения квадрата.</p>
+            <p>Текущие координаты: X: {{ x }}, Y: {{ y }}</p>
+            <button @click="resetPosition">Сбросить позицию</button>
+        </div>
+    </div>
+
+    <script>
+    const { createApp, ref, onMounted, onBeforeUnmount } = Vue;
+
+    createApp({
+        setup() {
+            const x = ref(Math.floor(Math.random() * (640 - 7)) + 2);
+            const y = ref(Math.floor(Math.random() * (480 - 7)) + 2);
+            const step = 5;
+
+            const moveSquare = (event) => {
+                if (event.key === "ArrowLeft" && x.value > 2) {
+                    x.value -= step;
+                }
+                if (event.key === "ArrowRight" && x.value < 640 - 7) {
+                    x.value += step;
+                }
+                if (event.key === "ArrowUp" && y.value > 2) {
+                    y.value -= step;
+                }
+                if (event.key === "ArrowDown" && y.value < 480 - 7) {
+                    y.value += step;
+                }
+            };
+
+            const resetPosition = () => {
+                x.value = Math.floor(Math.random() * (640 - 7)) + 2;
+                y.value = Math.floor(Math.random() * (480 - 7)) + 2;
+            };
+
+            onMounted(() => {
+                const appElement = document.getElementById('app');
+                appElement.addEventListener('keydown', moveSquare);
+                appElement.focus(); // Set focus on the app element to capture key events
+            });
+
+            onBeforeUnmount(() => {
+                const appElement = document.getElementById('app');
+                appElement.removeEventListener('keydown', moveSquare);
+            });
+
+            return {
+                x,
+                y,
+                resetPosition
+            };
+        }
+    }).mount('#app');
+    </script>
+</body>
+</html>
